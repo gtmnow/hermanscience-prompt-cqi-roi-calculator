@@ -33,6 +33,7 @@ export function calculateRoi(inputs: Inputs): CalculatorResult {
     (sum, row) => sum + row.bestRate * row.mix,
     0,
   );
+
   const weeklyHoursRecovered = inputs.weeklyLlmHours * calculatedProductivityFactor;
   const annualHoursRecovered = weeklyHoursRecovered * 52;
   const weeklyValueCreated = weeklyHoursRecovered * inputs.hourlyWage;

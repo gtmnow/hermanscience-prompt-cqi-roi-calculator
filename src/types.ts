@@ -52,5 +52,9 @@ export interface CalculatorResult {
   calculatedProductivityFactor: number;
   weeklyHoursRecovered: number;
   annualHoursRecovered: number;
-  weeklyValue
+  weeklyValueCreated: number;
+  annualValueCreated: number;
+  taskRows: TaskOpportunity[];
+  mixTotal: number;
+  isMixValid: boolean;
 }
