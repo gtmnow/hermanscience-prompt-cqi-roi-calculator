@@ -53,3 +53,4 @@ export interface CalculatorResult {
   weeklyHoursRecovered: number;
   annualHoursRecovered: number;
   weeklyValue
+}
