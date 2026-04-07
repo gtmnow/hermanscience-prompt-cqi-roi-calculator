@@ -29,21 +29,19 @@ export function calculateRoi(inputs: Inputs): CalculatorResult {
     };
   });
 
-  const selectedLift = taskRows.reduce((sum, row) => sum + row.selectedRate * row.mix, 0);
-  const bestObservedHeadroom = taskRows.reduce((sum, row) => sum + row.bestRate * row.mix, 0);
-  const appliedProductivityFactor =
-    inputs.roiBasis === 'selected_lift' ? selectedLift : bestObservedHeadroom;
-  const weeklyHoursRecovered = inputs.weeklyLlmHours * appliedProductivityFactor;
+  const calculatedProductivityFactor = taskRows.reduce(
+    (sum, row) => sum + row.bestRate * row.mix,
+    0,
+  );
+  const weeklyHoursRecovered = inputs.weeklyLlmHours * calculatedProductivityFactor;
   const annualHoursRecovered = weeklyHoursRecovered * 52;
-  const weeklyValueCreated = weeklyHoursRecovered * inputs.hourlyValue;
+  const weeklyValueCreated = weeklyHoursRecovered * inputs.hourlyWage;
   const annualValueCreated = weeklyValueCreated * 52;
   const mixTotal = taskRows.reduce((sum, row) => sum + row.mix, 0);
   const isMixValid = Math.abs(mixTotal - 1) < 0.00001;
 
   return {
-    selectedLift,
-    bestObservedHeadroom,
-    appliedProductivityFactor,
+    calculatedProductivityFactor,
     weeklyHoursRecovered,
     annualHoursRecovered,
     weeklyValueCreated,

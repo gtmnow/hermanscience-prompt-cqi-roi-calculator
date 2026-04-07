@@ -7,8 +7,6 @@ export type TaskKey =
   | 'risk_analysis'
   | 'writing';
 
-export type RoiBasis = 'selected_lift' | 'best_observed_opportunity';
-
 export interface TaskDefinition {
   key: TaskKey;
   label: string;
@@ -34,8 +32,7 @@ export interface LatencyEntry {
 export interface Inputs {
   profileKey: string;
   weeklyLlmHours: number;
-  hourlyValue: number;
-  roiBasis: RoiBasis;
+  hourlyWage: number;
   taskMix: Record<TaskKey, number>;
 }
 
@@ -52,14 +49,7 @@ export interface TaskOpportunity {
 }
 
 export interface CalculatorResult {
-  selectedLift: number;
-  bestObservedHeadroom: number;
-  appliedProductivityFactor: number;
+  calculatedProductivityFactor: number;
   weeklyHoursRecovered: number;
   annualHoursRecovered: number;
-  weeklyValueCreated: number;
-  annualValueCreated: number;
-  taskRows: TaskOpportunity[];
-  mixTotal: number;
-  isMixValid: boolean;
-}
+  weeklyValue

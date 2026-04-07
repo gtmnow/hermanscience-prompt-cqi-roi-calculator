@@ -10,9 +10,8 @@ import { calculateRoi } from './utils/calculator';
 const initialInputs: Inputs = {
   profileKey: 'peacemaker',
   weeklyLlmHours: 4,
-  hourlyValue: 35,
-  roiBasis: 'best_observed_opportunity',
-  taskMix: defaultTaskMix,
+  hourlyWage: 35,
+  taskMix: { ...defaultTaskMix },
 };
 
 function getUiScale(): number {

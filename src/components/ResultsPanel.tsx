@@ -14,55 +14,14 @@ export function ResultsPanel({ result }: ResultsPanelProps) {
       <div className="panel-header">Outputs</div>
 
       <div className="metric-grid">
-        <Metric label="Selected CQI lift vs neutral" value={formatPercent(result.selectedLift)} />
         <Metric
-          label="Best observed headroom"
-          value={formatPercent(result.bestObservedHeadroom)}
-        />
-        <Metric
-          label="Applied productivity factor"
-          value={formatPercent(result.appliedProductivityFactor)}
+          label="Calculated productivity factor"
+          value={formatPercent(result.calculatedProductivityFactor)}
         />
         <Metric label="Weekly hours recovered" value={formatHours(result.weeklyHoursRecovered)} />
         <Metric label="Annual hours recovered" value={formatHours(result.annualHoursRecovered)} />
         <Metric label="Weekly value created" value={formatCurrency(result.weeklyValueCreated)} />
         <Metric label="Annual value created" value={formatCurrency(result.annualValueCreated)} />
-      </div>
-
-      <div className="section-spacer" />
-
-      <div className="subsection-title">Task-level opportunity</div>
-      <div className="task-table-wrap">
-        <table className="task-table compact">
-          <thead>
-            <tr>
-              <th>Task</th>
-              <th>Selected</th>
-              <th>Best</th>
-              <th>Gap</th>
-              <th>Weighted gap</th>
-              <th>Latency vs neutral</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedRows.map((row) => {
-              const delta = row.selectedLatency - row.neutralLatency;
-              const fasterOrSlower = delta <= 0 ? 'faster' : 'slower';
-              return (
-                <tr key={row.task}>
-                  <td>{row.taskLabel}</td>
-                  <td>{formatPercent(row.selectedRate)}</td>
-                  <td>{formatPercent(row.bestRate)}</td>
-                  <td>{formatPercent(row.gap)}</td>
-                  <td>{formatPercent(row.weightedGap)}</td>
-                  <td>
-                    {Math.abs(delta).toFixed(1)}s {fasterOrSlower}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
       </div>
 
       <div className="section-spacer" />
@@ -82,6 +41,52 @@ export function ResultsPanel({ result }: ResultsPanelProps) {
           </div>
         ))}
       </div>
+
+      <div className="section-spacer" />
+
+      <details className="details-panel">
+        <summary className="details-summary">
+          <span>Task-level opportunity details</span>
+          <span className="details-summary-note">(click for details)</span>
+          <span className="details-chevron" aria-hidden="true">
+            ▾
+          </span>
+        </summary>
+
+        <div className="task-table-wrap details-content">
+          <table className="task-table compact">
+            <thead>
+              <tr>
+                <th>Task</th>
+                <th>Selected</th>
+                <th>Best</th>
+                <th>Gap</th>
+                <th>Weighted gap</th>
+                <th>Latency vs neutral</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedRows.map((row) => {
+                const delta = row.selectedLatency - row.neutralLatency;
+                const fasterOrSlower = delta <= 0 ? 'faster' : 'slower';
+
+                return (
+                  <tr key={row.task}>
+                    <td>{row.taskLabel}</td>
+                    <td>{formatPercent(row.selectedRate)}</td>
+                    <td>{formatPercent(row.bestRate)}</td>
+                    <td>{formatPercent(row.gap)}</td>
+                    <td>{formatPercent(row.weightedGap)}</td>
+                    <td>
+                      {Math.abs(delta).toFixed(1)}s {fasterOrSlower}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </details>
     </section>
   );
 }

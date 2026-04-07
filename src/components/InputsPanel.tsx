@@ -1,5 +1,5 @@
 import { profiles, tasks } from '../data/evalData';
-import type { Inputs, RoiBasis, TaskKey } from '../types';
+import type { Inputs, TaskKey } from '../types';
 import { formatPercent } from '../utils/calculator';
 
 interface InputsPanelProps {
@@ -10,19 +10,6 @@ interface InputsPanelProps {
   onTaskMixChange: (task: TaskKey, value: number) => void;
   onNormalize: () => void;
 }
-
-const roiBasisOptions: { value: RoiBasis; label: string; help: string }[] = [
-  {
-    value: 'best_observed_opportunity',
-    label: 'Best Observed Opportunity',
-    help: 'Uses the weighted best result seen for each task in the initial dataset.',
-  },
-  {
-    value: 'selected_lift',
-    label: 'Selected CQI Lift vs Neutral',
-    help: 'Uses the weighted lift of the currently selected profile vs the neutral baseline.',
-  },
-];
 
 export function InputsPanel({
   inputs,
@@ -38,7 +25,7 @@ export function InputsPanel({
 
       <div className="input-grid">
         <label>
-          <span>Profile baseline</span>
+          <span>Persona profile</span>
           <select
             value={inputs.profileKey}
             onChange={(event) => onInputChange('profileKey', event.target.value)}
@@ -52,7 +39,7 @@ export function InputsPanel({
         </label>
 
         <label>
-          <span>Weekly LLM use</span>
+          <span>Weekly LLM use (hours)</span>
           <input
             type="number"
             min="0"
@@ -63,35 +50,19 @@ export function InputsPanel({
         </label>
 
         <label>
-          <span>Hourly value</span>
-          <input
-            type="number"
-            min="0"
-            step="1"
-            value={inputs.hourlyValue}
-            onChange={(event) => onInputChange('hourlyValue', Number(event.target.value))}
-          />
+          <span>Hourly wage (dollars)</span>
+          <div className="currency-input-wrap">
+            <span className="currency-prefix">$</span>
+            <input
+              className="currency-input"
+              type="number"
+              min="0"
+              step="1"
+              value={inputs.hourlyWage}
+              onChange={(event) => onInputChange('hourlyWage', Number(event.target.value))}
+            />
+          </div>
         </label>
-
-        <label>
-          <span>ROI basis</span>
-          <select
-            value={inputs.roiBasis}
-            onChange={(event) => onInputChange('roiBasis', event.target.value as RoiBasis)}
-          >
-            {roiBasisOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </div>
-
-      <div className="helper-text muted">
-        {
-          roiBasisOptions.find((option) => option.value === inputs.roiBasis)?.help
-        }
       </div>
 
       <div className="section-spacer" />
@@ -101,9 +72,9 @@ export function InputsPanel({
         <table className="task-table">
           <thead>
             <tr>
-              <th>Task</th>
-              <th>Mix</th>
-              <th>Sample prompt</th>
+              <th className="center-header">Task</th>
+              <th className="center-header">Mix</th>
+              <th className="center-header">Sample prompt</th>
             </tr>
           </thead>
           <tbody>
@@ -124,7 +95,7 @@ export function InputsPanel({
                       }
                     />
                     <span className="mix-suffix">%</span>
-                  </div>  
+                  </div>
                 </td>
                 <td className="sample-prompt">{task.samplePrompt}</td>
               </tr>

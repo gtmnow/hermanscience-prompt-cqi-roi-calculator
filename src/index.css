@@ -169,6 +169,25 @@ select {
   color: var(--ink);
 }
 
+.currency-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.currency-prefix {
+  position: absolute;
+  left: 14px;
+  color: #5e748a;
+  font-weight: 700;
+  pointer-events: none;
+}
+
+.currency-input {
+  width: 100%;
+  padding-left: 30px;
+}
+
 .helper-text {
   font-size: 13px;
   margin-top: -4px;
@@ -206,6 +225,10 @@ select {
   text-align: left;
   padding: 12px 14px;
   font-size: 14px;
+}
+
+.task-table thead th.center-header {
+  text-align: center;
 }
 
 .task-table td,
@@ -333,6 +356,52 @@ select {
   background: linear-gradient(90deg, #2a87c8 0%, var(--cyan) 100%);
 }
 
+.details-panel {
+  margin: 0 20px 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: #fbfdff;
+  overflow: hidden;
+}
+
+.details-summary {
+  list-style: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 18px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.details-summary::-webkit-details-marker {
+  display: none;
+}
+
+.details-summary-note {
+  font-size: 14px;
+  font-weight: 500;
+  color: #658095;
+}
+
+.details-chevron {
+  margin-left: auto;
+  font-size: 16px;
+  color: #658095;
+  transition: transform 0.2s ease;
+}
+
+.details-panel[open] .details-chevron {
+  transform: rotate(180deg);
+}
+
+.details-content {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 .notes-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -349,6 +418,7 @@ select {
 .footnote {
   padding-bottom: 20px;
   color: #5e748a;
+  text-align: center;
 }
 
 @media (max-width: 1100px) {
@@ -396,5 +466,13 @@ select {
   .inline-actions {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .details-panel {
+    margin-inline: 16px;
+  }
+
+  .details-summary {
+    flex-wrap: wrap;
   }
 }
