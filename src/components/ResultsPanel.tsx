@@ -8,20 +8,40 @@ interface ResultsPanelProps {
 export function ResultsPanel({ result }: ResultsPanelProps) {
   const sortedRows = [...result.taskRows].sort((a, b) => b.weightedGap - a.weightedGap);
   const maxBar = Math.max(...sortedRows.map((row) => row.weightedGap), 0.0001);
+  const showValidOutputs = result.isMixValid;
 
   return (
     <section className="panel">
-      <div className="panel-header">Outputs</div>
+      <div className="panel-header">
+        <span>Outputs</span>
+        {!showValidOutputs && (
+          <span className="panel-header-warning">
+            Task mix must equal 100% (current: {formatPercent(result.mixTotal)})
+          </span>
+        )}
+      </div>
 
       <div className="metric-grid">
         <Metric
           label="Calculated productivity factor"
-          value={formatPercent(result.calculatedProductivityFactor)}
+          value={showValidOutputs ? formatPercent(result.calculatedProductivityFactor) : ''}
         />
-        <Metric label="Weekly hours recovered" value={formatHours(result.weeklyHoursRecovered)} />
-        <Metric label="Annual hours recovered" value={formatHours(result.annualHoursRecovered)} />
-        <Metric label="Weekly value created" value={formatCurrency(result.weeklyValueCreated)} />
-        <Metric label="Annual value created" value={formatCurrency(result.annualValueCreated)} />
+        <Metric
+          label="Weekly hours recovered"
+          value={showValidOutputs ? formatHours(result.weeklyHoursRecovered) : ''}
+        />
+        <Metric
+          label="Annual hours recovered"
+          value={showValidOutputs ? formatHours(result.annualHoursRecovered) : ''}
+        />
+        <Metric
+          label="Weekly value created"
+          value={showValidOutputs ? formatCurrency(result.weeklyValueCreated) : ''}
+        />
+        <Metric
+          label="Annual value created"
+          value={showValidOutputs ? formatCurrency(result.annualValueCreated) : ''}
+        />
       </div>
 
       <div className="section-spacer" />
@@ -95,7 +115,7 @@ function Metric({ label, value }: { label: string; value: string }) {
   return (
     <div className="metric-card">
       <div className="metric-label">{label}</div>
-      <div className="metric-value">{value}</div>
+      <div className="metric-value">{value || '—'}</div>
     </div>
   );
 }

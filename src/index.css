@@ -476,3 +476,17 @@ select {
     flex-wrap: wrap;
   }
 }
+
+.panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.panel-header-warning {
+  font-size: 0.85rem;
+  color: #b45309; /* amber-700 */
+  background: #fef3c7; /* amber-100 */
+  padding: 4px 8px;
+  border-radius: 4px;
+}
