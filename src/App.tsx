@@ -10,21 +10,21 @@ import { calculateRoi } from './utils/calculator';
 const initialInputs: Inputs = {
   profileKey: 'peacemaker',
   weeklyLlmHours: 4,
-  hourlyWage: 35,
+  annualSalary: 156000,
   taskMix: { ...defaultTaskMix },
 };
 
 function getUiScale(): number {
-  if (typeof window === 'undefined') return 1;
+  if (typeof window === 'undefined') return 0.7;
 
   const params = new URLSearchParams(window.location.search);
   const rawScale = params.get('scale');
 
-  if (!rawScale) return 1;
+  if (!rawScale) return 0.7;
 
   const parsed = Number(rawScale);
 
-  if (!Number.isFinite(parsed)) return 1;
+  if (!Number.isFinite(parsed)) return 0.7;
 
   return Math.min(Math.max(parsed, 0.5), 1.5);
 }

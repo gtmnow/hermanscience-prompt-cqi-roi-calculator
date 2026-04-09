@@ -11,6 +11,10 @@ interface InputsPanelProps {
   onNormalize: () => void;
 }
 
+function formatNumber(value: number): string {
+  return new Intl.NumberFormat('en-US').format(value || 0);
+}
+
 export function InputsPanel({
   inputs,
   mixTotal,
@@ -50,16 +54,21 @@ export function InputsPanel({
         </label>
 
         <label>
-          <span>Hourly wage (dollars)</span>
+          <span>Fully burdened annual salary (dollars)</span>
           <div className="currency-input-wrap">
             <span className="currency-prefix">$</span>
             <input
               className="currency-input"
-              type="number"
-              min="0"
-              step="1"
-              value={inputs.hourlyWage}
-              onChange={(event) => onInputChange('hourlyWage', Number(event.target.value))}
+              type="text"
+              inputMode="numeric"
+              value={formatNumber(inputs.annualSalary)}
+              onChange={(event) => {
+                const raw = event.target.value.replace(/,/g, '');
+                const numeric = Number(raw);
+                if (!isNaN(numeric)) {
+                  onInputChange('annualSalary', numeric);
+                }
+              }}
             />
           </div>
         </label>
