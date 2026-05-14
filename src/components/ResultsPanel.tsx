@@ -1,5 +1,11 @@
 import type { CalculatorResult } from '../types';
-import { formatCurrency, formatHours, formatPercent } from '../utils/calculator';
+import {
+  formatCurrency,
+  formatHours,
+  formatPercent,
+  formatTokenCount,
+  formatTokenMillions,
+} from '../utils/calculator';
 
 interface ResultsPanelProps {
   result: CalculatorResult;
@@ -8,41 +14,58 @@ interface ResultsPanelProps {
 export function ResultsPanel({ result }: ResultsPanelProps) {
   const sortedRows = [...result.taskRows].sort((a, b) => b.weightedGap - a.weightedGap);
   const maxBar = Math.max(...sortedRows.map((row) => row.weightedGap), 0.0001);
-  const showValidOutputs = result.isMixValid;
+  const topProductivityDrivers = sortedRows.slice(0, 3);
+  const topTokenDriver = [...result.taskRows].sort(
+    (a, b) => b.weightedTokenSavings - a.weightedTokenSavings,
+  )[0];
+  const productivityDriverLabels = topProductivityDrivers.map((row) => row.taskLabel).join(', ');
 
   return (
     <section className="panel">
       <div className="panel-header">
         <span>Outputs</span>
-        {!showValidOutputs && (
-          <span className="panel-header-warning">
-            Task mix must equal 100% (current: {formatPercent(result.mixTotal)})
-          </span>
-        )}
       </div>
 
       <div className="metric-grid">
         <Metric
-          label="Calculated productivity factor"
-          value={showValidOutputs ? formatPercent(result.calculatedProductivityFactor) : ''}
-        />
-        <Metric
-          label="Weekly hours recovered"
-          value={showValidOutputs ? formatHours(result.weeklyHoursRecovered) : ''}
-        />
-        <Metric
-          label="Annual hours recovered"
-          value={showValidOutputs ? formatHours(result.annualHoursRecovered) : ''}
+          label="Annual value created"
+          value={formatCurrency(result.annualValueCreated)}
+          tone="value"
         />
         <Metric
           label="Weekly value created"
-          value={showValidOutputs ? formatCurrency(result.weeklyValueCreated) : ''}
+          value={formatCurrency(result.weeklyValueCreated)}
+          tone="value"
         />
         <Metric
-          label="Annual value created"
-          value={showValidOutputs ? formatCurrency(result.annualValueCreated) : ''}
+          label="Calculated productivity factor"
+          value={formatPercent(result.calculatedProductivityFactor)}
+        />
+        <Metric
+          label="Token savings factor"
+          value={formatPercent(result.calculatedTokenSavingsFactor)}
         />
       </div>
+
+      <div className="section-spacer" />
+
+      <details className="details-panel">
+        <summary className="details-summary">
+          <span>Explain this estimate</span>
+          <span className="details-summary-note">(click for details)</span>
+          <span className="details-chevron" aria-hidden="true">
+            ▾
+          </span>
+        </summary>
+
+        <div className="results-explainer details-content">
+          <p className="results-explainer-copy">
+            The biggest productivity upside in this role mix comes from {productivityDriverLabels}.
+            Token savings are driven most by {topTokenDriver.taskLabel}, where usage intensity and
+            average prompt savings are both relatively high.
+          </p>
+        </div>
+      </details>
 
       <div className="section-spacer" />
 
@@ -66,7 +89,34 @@ export function ResultsPanel({ result }: ResultsPanelProps) {
 
       <details className="details-panel">
         <summary className="details-summary">
-          <span>Task-level opportunity details</span>
+          <span>Supporting calculation details</span>
+          <span className="details-summary-note">(click for details)</span>
+          <span className="details-chevron" aria-hidden="true">
+            ▾
+          </span>
+        </summary>
+
+        <div className="metric-grid supporting-metrics details-content">
+          <Metric label="Weekly hours recovered" value={formatHours(result.weeklyHoursRecovered)} />
+          <Metric label="Annual hours recovered" value={formatHours(result.annualHoursRecovered)} />
+          <Metric
+            label="Estimated weekly token volume"
+            value={formatTokenMillions(result.weeklyTokenConsumption)}
+          />
+          <Metric
+            label="Estimated annual token volume"
+            value={formatTokenMillions(result.annualTokenConsumption)}
+          />
+          <Metric label="Weekly tokens saved" value={formatTokenMillions(result.weeklyTokenSavings)} />
+          <Metric label="Annual tokens saved" value={formatTokenMillions(result.annualTokenSavings)} />
+        </div>
+      </details>
+
+      <div className="section-spacer" />
+
+      <details className="details-panel">
+        <summary className="details-summary">
+          <span>Task-level drivers</span>
           <span className="details-summary-note">(click for details)</span>
           <span className="details-chevron" aria-hidden="true">
             ▾
@@ -78,31 +128,27 @@ export function ResultsPanel({ result }: ResultsPanelProps) {
             <thead>
               <tr>
                 <th>Task</th>
-                <th>Selected</th>
-                <th>Best</th>
-                <th>Gap</th>
+                <th>Role mix</th>
                 <th>Weighted gap</th>
-                <th>Latency vs neutral</th>
+                <th>Token usage</th>
+                <th>Avg token savings</th>
+                <th>Why it matters</th>
               </tr>
             </thead>
             <tbody>
-              {sortedRows.map((row) => {
-                const delta = row.selectedLatency - row.neutralLatency;
-                const fasterOrSlower = delta <= 0 ? 'faster' : 'slower';
-
-                return (
-                  <tr key={row.task}>
-                    <td>{row.taskLabel}</td>
-                    <td>{formatPercent(row.selectedRate)}</td>
-                    <td>{formatPercent(row.bestRate)}</td>
-                    <td>{formatPercent(row.gap)}</td>
-                    <td>{formatPercent(row.weightedGap)}</td>
-                    <td>
-                      {Math.abs(delta).toFixed(1)}s {fasterOrSlower}
-                    </td>
-                  </tr>
-                );
-              })}
+              {sortedRows.map((row) => (
+                <tr key={row.task}>
+                  <td>{row.taskLabel}</td>
+                  <td>{formatPercent(row.mix)}</td>
+                  <td>{formatPercent(row.weightedGap)}</td>
+                  <td>{formatTokenCount(row.selectedTokenUsageRate)}</td>
+                  <td>{formatPercent(row.selectedTokenSavingsRate)}</td>
+                  <td className="task-why-cell">
+                    High impact from a {formatPercent(row.mix)} workload share with a{' '}
+                    {formatPercent(row.gap)} prompt alignment gap.
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -111,9 +157,17 @@ export function ResultsPanel({ result }: ResultsPanelProps) {
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function Metric({
+  label,
+  value,
+  tone = 'default',
+}: {
+  label: string;
+  value: string;
+  tone?: 'default' | 'value';
+}) {
   return (
-    <div className="metric-card">
+    <div className={`metric-card${tone === 'value' ? ' metric-card-value' : ''}`}>
       <div className="metric-label">{label}</div>
       <div className="metric-value">{value || '—'}</div>
     </div>

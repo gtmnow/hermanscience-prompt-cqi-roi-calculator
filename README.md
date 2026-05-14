@@ -1,12 +1,14 @@
 # HermanScience Prompt CQI Alignment ROI Calculator
 
-Browser-based ROI calculator prototype built from the initial prompt-eval results.
+Browser-based ROI and token-savings calculator for prompt-type alignment.
 
 ## What is included
 
-- HermanScience-styled React + TypeScript web app
+- Herman Science-styled React + TypeScript web app
 - Static dataset based on the initial evaluation workbook
-- ROI model for task mix, selected profile, and estimated value recovery
+- Role-based task-mix presets by function/role and Type-based profile selection
+- Token savings estimation using the savings matrix
+- Value recovery outputs for both time and token economics
 - GitHub Pages workflow for public deployment
 
 ## Local run
@@ -14,6 +16,11 @@ Browser-based ROI calculator prototype built from the initial prompt-eval result
 ```bash
 npm install
 npm run dev
+```
+Or use Make:
+
+```bash
+make run
 ```
 
 ## Production build
@@ -35,12 +42,16 @@ npm run preview
 
 ## Current model logic
 
-- **Selected CQI lift vs neutral** = weighted selected-profile win rate across the entered task mix.
-- **Best observed headroom** = weighted best win rate seen across all profiles for each task.
+- **Selected CQI lift vs neutral** = weighted selected Type uplift across the role mix.
+- **Best observed headroom** = weighted best win rate seen across all Types for each task.
 - **Applied productivity factor** = chosen ROI basis.
 - **Weekly hours recovered** = weekly LLM hours × applied productivity factor.
 - **Value created** = recovered hours × hourly value.
+- **Token savings factor** = weighted selected Type savings rate across role mix.
+- **Estimated weekly token volume** = weekly LLM hours × 60 prompts/hour assumption × task-type-specific token usage (from Calculation Detail data, multiplied by 40), then blended by role mix.
+- **Weekly token savings** = estimated weekly token volume × token savings factor.
+- **Token value created** = weekly token savings × cost per million tokens.
 
 ## Important note
 
-This prototype still uses the profile labels from the initial evaluation dataset. When a true CQI-labeled dataset is ready, replace the values in `src/data/evalData.ts` and the app will update without structural changes.
+Profile labels are now shown as Type 1–Type 9. Role presets now drive task mix automatically, so task mix inputs are no longer editable in the UI. Update `roles` in `src/data/evalData.ts` if you want different role-task mixes.
