@@ -42,16 +42,16 @@ npm run preview
 
 ## Current model logic
 
-- **Selected CQI lift vs neutral** = weighted selected Type uplift across the role mix.
-- **Best observed headroom** = weighted best win rate seen across all Types for each task.
+- **Selected CQI lift vs neutral** = weighted selected personality uplift across the role mix.
+- **Best observed headroom** = weighted best win rate seen across all personality types for each task.
 - **Applied productivity factor** = chosen ROI basis.
 - **Weekly hours recovered** = weekly LLM hours × applied productivity factor.
 - **Value created** = recovered hours × hourly value.
-- **Token savings factor** = weighted selected Type savings rate across role mix.
+- **Token savings factor** = weighted selected personality savings rate across role mix.
 - **Estimated weekly token volume** = weekly LLM hours × 60 prompts/hour assumption × task-type-specific token usage (from Calculation Detail data, multiplied by 40), then blended by role mix.
 - **Weekly token savings** = estimated weekly token volume × token savings factor.
 - **Token value created** = weekly token savings × cost per million tokens.
 
 ## Important note
 
-Profile labels are now shown as Type 1–Type 9. Role presets now drive task mix automatically, so task mix inputs are no longer editable in the UI. Update `roles` in `src/data/evalData.ts` if you want different role-task mixes.
+Profile labels use the Enneagram names Reformer, Helper, Achiever, Individualist, Investigator, Loyalist, Enthusiast, Challenger, and Peacemaker. Role presets provide the initial task mix, which can then be adjusted in the UI. Update `roles` in `src/data/evalData.ts` if you want different role-task mix defaults.

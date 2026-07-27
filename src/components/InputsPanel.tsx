@@ -60,7 +60,7 @@ export function InputsPanel({
         </label>
 
         <label>
-          <span>LLM User Personality Type</span>
+          <span>User Personality Type</span>
           <select
             value={inputs.profileKey}
             onChange={(event) => onInputChange('profileKey', event.target.value as ProfileKey)}

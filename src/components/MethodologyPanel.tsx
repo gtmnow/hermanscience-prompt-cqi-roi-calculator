@@ -26,7 +26,7 @@ export function MethodologyPanel() {
                 Users now select a role/function. The role drives task mix automatically from preset role profiles.
               </li>
               <li>
-                Token savings use a single average savings rate for each task across all Types, then blend those task rates by role/task mix.
+                Token savings use a single average savings rate for each task across all personality types, then blend those task rates by role/task mix.
               </li>
               <li>
                 Estimated token volume is calculated from your weekly LLM hours and role task mix using the
