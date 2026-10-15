@@ -3,15 +3,17 @@ import { Header } from './components/Header';
 import { InputsPanel } from './components/InputsPanel';
 import { MethodologyPanel } from './components/MethodologyPanel';
 import { ResultsPanel } from './components/ResultsPanel';
-import { defaultTaskMix } from './data/evalData';
-import type { Inputs, TaskKey } from './types';
+import { defaultTokenCostPerMillion, roles } from './data/evalData';
+import type { Inputs, RoleKey, TaskKey } from './types';
 import { calculateRoi } from './utils/calculator';
 
 const initialInputs: Inputs = {
   profileKey: 'peacemaker',
-  weeklyLlmHours: 4,
-  annualSalary: 156000,
-  taskMix: { ...defaultTaskMix },
+  roleKey: 'marketing',
+  weeklyLlmHours: roles[0].defaultWeeklyLlmHours,
+  annualSalary: roles[0].defaultAnnualSalary,
+  tokenCostPerMillion: defaultTokenCostPerMillion,
+  taskMix: roles[0].taskMix,
 };
 
 function getUiScale(): number {
@@ -31,6 +33,7 @@ function getUiScale(): number {
 
 function App() {
   const [inputs, setInputs] = useState<Inputs>(initialInputs);
+  const [isTaskMixOpen, setIsTaskMixOpen] = useState(false);
 
   const uiScale = useMemo(() => getUiScale(), []);
   const scaledWidth = `${100 / uiScale}%`;
@@ -39,6 +42,22 @@ function App() {
 
   function updateInput<K extends keyof Inputs>(key: K, value: Inputs[K]) {
     setInputs((current) => ({ ...current, [key]: value }));
+  }
+
+  function updateRole(roleKey: RoleKey) {
+    const selectedRole = roles.find((role) => role.key === roleKey) ?? roles[0];
+
+    if (roleKey === 'user_defined') {
+      setIsTaskMixOpen(true);
+    }
+
+    setInputs((current) => ({
+      ...current,
+      roleKey,
+      weeklyLlmHours: selectedRole.defaultWeeklyLlmHours,
+      annualSalary: selectedRole.defaultAnnualSalary,
+      taskMix: { ...selectedRole.taskMix },
+    }));
   }
 
   function updateTaskMix(task: TaskKey, value: number) {
@@ -50,21 +69,6 @@ function App() {
         ...current.taskMix,
         [task]: normalizedValue,
       },
-    }));
-  }
-
-  function normalizeTaskMix() {
-    const total = Object.values(inputs.taskMix).reduce((sum, value) => sum + value, 0);
-    if (total <= 0) return;
-
-    const normalizedEntries = Object.entries(inputs.taskMix).map(([task, value]) => [
-      task,
-      value / total,
-    ]);
-
-    setInputs((current) => ({
-      ...current,
-      taskMix: Object.fromEntries(normalizedEntries) as Inputs['taskMix'],
     }));
   }
 
@@ -82,11 +86,28 @@ function App() {
           <main className="dashboard-grid">
             <InputsPanel
               inputs={inputs}
-              mixTotal={result.mixTotal}
-              isMixValid={result.isMixValid}
+              onRoleChange={updateRole}
               onInputChange={updateInput}
               onTaskMixChange={updateTaskMix}
-              onNormalize={normalizeTaskMix}
+              isTaskMixOpen={isTaskMixOpen}
+              onTaskMixOpenChange={setIsTaskMixOpen}
+              onNormalizeTaskMix={() => {
+                const total = Object.values(inputs.taskMix).reduce((sum, value) => sum + value, 0);
+
+                if (total <= 0) {
+                  return;
+                }
+
+                const normalizedEntries = Object.entries(inputs.taskMix).map(([task, value]) => [
+                  task,
+                  value / total,
+                ]);
+
+                setInputs((current) => ({
+                  ...current,
+                  taskMix: Object.fromEntries(normalizedEntries) as Inputs['taskMix'],
+                }));
+              }}
             />
             <ResultsPanel result={result} />
             <MethodologyPanel />
